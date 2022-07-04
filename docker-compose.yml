@@ -1,0 +1,11 @@
+version: '3.2'
+
+services:
+
+  php:
+    restart: "no"
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/home/console-animals-app
