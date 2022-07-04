@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Application;
+use Throwable;
 
 abstract class Controller
 {
@@ -12,8 +13,9 @@ abstract class Controller
      * @param  array $argv
      *
      * @return void
+     * @throws Throwable
      */
-    abstract public function use(array $argv): void;
+    abstract public function handle(array $argv): void;
 
     /**
      * @param Application $application
@@ -21,13 +23,5 @@ abstract class Controller
     public function __construct(Application $application)
     {
         $this->application = $application;
-    }
-
-    /**
-     * @return Application
-     */
-    protected function getApplication(): Application
-    {
-        return $this->application;
     }
 }
