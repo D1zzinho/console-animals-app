@@ -19,5 +19,7 @@ class HuntController extends Controller
         }
 
         $dog = $argv[2];
+
+        // TODO handle hunt command
     }
 }

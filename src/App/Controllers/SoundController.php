@@ -20,6 +20,6 @@ class SoundController extends Controller
 
         $dog = $argv[2];
 
-        $this->application->getFormatter()->print();
+        // TODO handle sound command
     }
 }

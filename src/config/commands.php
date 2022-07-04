@@ -2,9 +2,9 @@
 
 return [
     'controllers' => [
-        'help'  => new \App\Controllers\HelpController($this),
-        'sound' => new \App\Controllers\SoundController($this),
-        'hunt'  => new \App\Controllers\HuntController($this)
+        'help'  => \App\Controllers\HelpController::class,
+        'sound' => \App\Controllers\SoundController::class,
+        'hunt'  => \App\Controllers\HuntController::class
     ],
 
     'anonymous' => [

@@ -9,6 +9,11 @@ abstract class Controller
 {
     protected Application $application;
 
+    public function __construct()
+    {
+        $this->application = Application::getInstance();
+    }
+
     /**
      * @param  array $argv
      *
@@ -16,12 +21,4 @@ abstract class Controller
      * @throws Throwable
      */
     abstract public function handle(array $argv): void;
-
-    /**
-     * @param Application $application
-     */
-    public function __construct(Application $application)
-    {
-        $this->application = $application;
-    }
 }

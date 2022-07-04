@@ -9,5 +9,5 @@ require __DIR__ . '/vendor/autoload.php';
 
 use App\Application;
 
-$app = new Application();
+$app = Application::getInstance();
 $app->bootstrap($argc, $argv);

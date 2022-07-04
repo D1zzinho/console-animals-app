@@ -9,3 +9,4 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./src:/home/console-animals-app
+      - ./php/configs.ini:/usr/local/etc/php/conf.d/configs.ini

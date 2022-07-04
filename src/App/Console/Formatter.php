@@ -3,10 +3,42 @@
 namespace App\Console;
 
 use DateTime;
+use Exception;
 
 class Formatter
 {
-    private string $message = "";
+    private static Formatter $instance;
+    private string           $message = "";
+
+    private function __construct()
+    {
+
+    }
+
+    private function __clone()
+    {
+
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function __wakeup()
+    {
+        throw new Exception(get_class($this) . ' cannot be unserialized.');
+    }
+
+    /**
+     * @return Formatter
+     */
+    public static function getInstance(): Formatter
+    {
+        if (!isset(self::$instance)) {
+            self::$instance = new static();
+        }
+
+        return self::$instance;
+    }
 
     /**
      * @param  string $message

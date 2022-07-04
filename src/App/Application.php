@@ -5,42 +5,70 @@ namespace App;
 use App\Console\ConsoleCommandStorage;
 use App\Console\Formatter;
 use App\Exceptions\NoArgumentsProvidedException;
+use Exception;
 use Throwable;
 
 class Application
 {
+    private static Application    $instance;
     private Formatter             $formatter;
     private ConsoleCommandStorage $consoleCommandStorage;
 
-    public function __construct()
+    private function __construct()
     {
-        $this->formatter = new Formatter();
-        $this->consoleCommandStorage = new ConsoleCommandStorage();
+        $this->consoleCommandStorage = ConsoleCommandStorage::getInstance();
+        $this->formatter = Formatter::getInstance();
+    }
+
+    private function __clone()
+    {
+
     }
 
     /**
-     * @param  int   $argc
-     * @param  array $argv
+     * @throws Exception
+     */
+    public function __wakeup()
+    {
+        throw new Exception(get_class($this) . ' cannot be unserialized.');
+    }
+
+    public static function getInstance(): Application
+    {
+        if (!isset(self::$instance)) {
+            self::$instance = new static();
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * @param int   $argc
+     * @param array $argv
      *
      * @return void
      */
     public function bootstrap(int $argc, array $argv): void
     {
-        $this->registerCommands();
+        $command = 'help';
 
         try {
             if ($argc === 1) {
                 throw new NoArgumentsProvidedException('No arguments provided! Type help for more info.');
             }
 
-            $this->formatter->print("Your argument is {$argv[1]}");
+            if (isset($argv[1])) {
+                $command = $argv[1];
+            }
+
+            call_user_func($this->consoleCommandStorage->getCommandCallback($command), $argv);
         } catch (Throwable $e) {
             $this->printThrowable($e);
         }
     }
 
     /**
-     * @param  Throwable $throwable
+     * @param Throwable $throwable
      *
      * @return void
      */
