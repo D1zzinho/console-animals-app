@@ -5,6 +5,8 @@
             "App\\": "App/"
         }
     },
-    "require": {},
+    "require": {
+        "php": "^8.1"
+    },
     "require-dev": {}
 }

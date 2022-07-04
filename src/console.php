@@ -1,6 +1,13 @@
-#!/usr/bin/php
+#!/usr/bin/php -d memory_limit=2048M -d post_max_size=0
 <?php
 
-if (php_sapi_name() !== 'cli') {
-    throw new Exception('This has to be run from the command line');
+if (PHP_SAPI !== 'cli') {
+    exit;
 }
+
+require __DIR__ . '/vendor/autoload.php';
+
+use App\Application;
+
+$app = new Application();
+$app->bootstrap($argc, $argv);
