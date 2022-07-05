@@ -4,12 +4,21 @@ namespace App\Console;
 
 use App\Controllers\Controller;
 use App\Exceptions\CommandNotFoundException;
+use App\Exceptions\NoArgumentsProvidedException;
+use App\Exceptions\WrongDogActionException;
+use App\Models\Dog;
 use Exception;
+use Throwable;
 
 class ConsoleCommandStorage
 {
     const COMMANDS_CONFIG_PATH = __DIR__ . '/../../config/commands.php';
     private static ConsoleCommandStorage $instance;
+
+    /**
+     * @var array<string, Dog>
+     */
+    private array $dogs = [];
 
     /**
      * @var array<string, Controller>
@@ -21,8 +30,11 @@ class ConsoleCommandStorage
      */
     private array $anonymousCommands = [];
 
+    private Formatter $formatter;
+
     private function __construct()
     {
+        $this->formatter = Formatter::getInstance();
         $this->registerConfigCommands();
     }
 
@@ -49,6 +61,37 @@ class ConsoleCommandStorage
         }
 
         return self::$instance;
+    }
+
+    /**
+     * @param  string $name
+     * @param  Dog    $dog
+     *
+     * @return void
+     */
+    public function addDog(string $name, Dog $dog): void
+    {
+        $this->dogs[$name] = $dog;
+    }
+
+    /**
+     * @param  array<string, Dog> $dogs
+     *
+     * @return void
+     */
+    public function addDogs(array $dogs): void
+    {
+        $this->dogs = array_merge($this->dogs, $dogs);
+    }
+
+    /**
+     * @param  string $command
+     *
+     * @return Dog|null
+     */
+    private function getDog(string $command): ?Dog
+    {
+        return isset($this->dogs[$command]) ? new $this->dogs[$command] : null;
     }
 
     /**
@@ -79,7 +122,7 @@ class ConsoleCommandStorage
      */
     private function getController(string $command): ?Controller
     {
-        return new $this->controllers[$command] ?? null;
+        return isset($this->controllers[$command]) ? new $this->controllers[$command] : null;
     }
 
     /**
@@ -114,27 +157,57 @@ class ConsoleCommandStorage
     }
 
     /**
+     * @param  int   $argc
+     * @param  array $argv
+     *
+     * @return void
+     */
+    public function callCommand(int $argc, array $argv): void
+    {
+        try {
+            if ($argc < 2) {
+                throw new NoArgumentsProvidedException('No arguments provided! Type help for more info.');
+            }
+
+            $request = new CommandRequest($argv);
+            $dog = $this->getDog($request->command);
+
+            if (!is_null($dog)) {
+                if (!isset($request->secondCommand)) {
+                    throw new WrongDogActionException('Missing action for dog. Type help for more info.');
+                }
+
+                $action = $this->getController($request->secondCommand);
+
+                if (is_null($action)) {
+                    throw new WrongDogActionException('Unknown action for dog. Type help for more info.');
+                }
+
+                $action->run($request, $dog);
+                exit;
+            }
+
+            call_user_func($this->getAnonymousCallable($request->command), $request);
+        } catch (Throwable $e) {
+            $this->formatter->printThrowable($e->getMessage());
+            exit;
+        }
+    }
+
+    /**
      * @param  string $command
      *
-     * @return array|string
+     * @return callable
      * @throws CommandNotFoundException
      */
-    public function getCommandCallback(string $command): array|string
+    public function getAnonymousCallable(string $command): callable
     {
-        $controller = $this->getController($command);
-        if ($controller instanceof Controller) {
-            return [
-                $controller,
-                'handle'
-            ];
-        }
-
         $anonymous = $this->getAnonymousCommand($command);
         if ($anonymous === null) {
             throw new CommandNotFoundException("Command \"$command\" not found. Type help for more info.");
         }
 
-        return $command;
+        return $anonymous;
     }
 
     /**
@@ -144,7 +217,8 @@ class ConsoleCommandStorage
     {
         $config = require self::COMMANDS_CONFIG_PATH;
 
-        $this->addControllers($config['controllers']);
+        $this->addDogs($config['dogs']);
+        $this->addControllers($config['actions']);
         $this->addAnonymousCommands($config['anonymous']);
     }
 }

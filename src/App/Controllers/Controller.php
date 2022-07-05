@@ -3,22 +3,38 @@
 namespace App\Controllers;
 
 use App\Application;
-use Throwable;
+use App\Console\CommandRequest;
+use App\Console\Formatter;
+use App\Models\Dog;
 
 abstract class Controller
 {
-    protected Application $application;
+    protected Application    $application;
+    protected Formatter      $formatter;
+    protected CommandRequest $request;
+    protected Dog            $dog;
 
     public function __construct()
     {
         $this->application = Application::getInstance();
+        $this->formatter = Formatter::getInstance();
     }
 
     /**
-     * @param  array $argv
+     * @return void
+     */
+    abstract public function handle(): void;
+
+    /**
+     * @param  CommandRequest $request
+     * @param  Dog            $dog
      *
      * @return void
-     * @throws Throwable
      */
-    abstract public function handle(array $argv): void;
+    public function run(CommandRequest $request, Dog $dog): void
+    {
+        $this->request = $request;
+        $this->dog = $dog;
+        $this->handle();
+    }
 }

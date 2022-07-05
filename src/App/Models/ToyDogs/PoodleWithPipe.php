@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\ToyDogs;
+
+use App\Models\ToyDog;
 
 class PoodleWithPipe extends ToyDog
 {
