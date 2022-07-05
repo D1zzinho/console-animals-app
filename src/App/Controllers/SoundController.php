@@ -2,24 +2,39 @@
 
 namespace App\Controllers;
 
-use App\Exceptions\DogTypeArgumentNotProvided;
+use App\Exceptions\WrongSoundTypeException;
 
 class SoundController extends Controller
 {
     /**
-     * @param array $argv
-     *
      * @return void
-     * @throws DogTypeArgumentNotProvided
+     * @throws WrongSoundTypeException
      */
-    public function handle(array $argv): void
+    public function handle(): void
     {
-        if (!isset($argv[2])) {
-            throw new DogTypeArgumentNotProvided('You have to call specified dog. Type help for more info.');
+        if (!$this->request->hasParam('sound')) {
+            throw new WrongSoundTypeException('You have to provide sound type! Type help for more info.');
         }
 
-        $dog = $argv[2];
+        $sound = $this->request->getParam('sound');
 
-        // TODO handle sound command
+        if ($this->hasSound($sound)) {
+            $this->formatter->print($this->dog->{$sound}());
+        }
+    }
+
+    /**
+     * @param  string $sound
+     *
+     * @return bool
+     * @throws WrongSoundTypeException
+     */
+    private function hasSound(string $sound): bool
+    {
+        if (!method_exists($this->dog, $sound)) {
+            throw new WrongSoundTypeException('Sound type not found! Type help for more info.');
+        }
+
+        return true;
     }
 }
