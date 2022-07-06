@@ -2,9 +2,9 @@
 
 namespace App\Models\ToyDogs;
 
-use App\Models\ToyDog;
+use App\Models\AbstractToyDog;
 
-class PlushPug extends ToyDog
+class PlushPug extends AbstractToyDog
 {
     /**
      * @return string

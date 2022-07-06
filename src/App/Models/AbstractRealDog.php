@@ -4,7 +4,7 @@ namespace App\Models;
 
 use ReflectionClass;
 
-abstract class RealDog implements Dog
+abstract class AbstractRealDog implements DogInterface
 {
     /**
      * @return string

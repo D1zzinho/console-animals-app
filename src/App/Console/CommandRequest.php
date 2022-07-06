@@ -41,6 +41,10 @@ class CommandRequest
      */
     private function loadParams(array $argv): void
     {
+        if (count($argv) > 3) {
+            array_splice($argv, 3);
+        }
+
         foreach ($argv as &$arg) {
             $pair = explode('=', $arg);
             if (count($pair) == 2) {

@@ -2,9 +2,9 @@
 
 namespace App\Models\RealDogs;
 
-use App\Models\RealDog;
+use App\Models\AbstractRealDog;
 
-class Pug extends RealDog
+class Pug extends AbstractRealDog
 {
     /**
      * @return string

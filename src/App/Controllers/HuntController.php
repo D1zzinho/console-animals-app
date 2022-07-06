@@ -9,6 +9,7 @@ class HuntController extends Controller
      */
     public function handle(): void
     {
-        $this->formatter->print($this->dog->hunt());
+        $dog = new (CONFIG['models'][$this->request->command]);
+        $this->formatter->print($dog->hunt());
     }
 }

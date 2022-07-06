@@ -2,9 +2,9 @@
 
 namespace App\Models\ToyDogs;
 
-use App\Models\ToyDog;
+use App\Models\AbstractToyDog;
 
-class PoodleWithPipe extends ToyDog
+class PoodleWithPipe extends AbstractToyDog
 {
     /**
      * @return string

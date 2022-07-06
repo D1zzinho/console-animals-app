@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Exceptions\WrongSoundTypeException;
+use App\Models\DogInterface;
 
 class SoundController extends Controller
 {
@@ -17,21 +18,23 @@ class SoundController extends Controller
         }
 
         $sound = $this->request->getParam('sound');
+        $dog = new (CONFIG['models'][$this->request->command]);
 
-        if ($this->hasSound($sound)) {
-            $this->formatter->print($this->dog->{$sound}());
+        if ($this->hasSound($dog, $sound)) {
+            $this->formatter->print($dog->{$sound}());
         }
     }
 
     /**
-     * @param  string $sound
+     * @param  DogInterface $dog
+     * @param  string       $sound
      *
      * @return bool
      * @throws WrongSoundTypeException
      */
-    private function hasSound(string $sound): bool
+    private function hasSound(DogInterface $dog, string $sound): bool
     {
-        if (!method_exists($this->dog, $sound)) {
+        if (!method_exists($dog, $sound)) {
             throw new WrongSoundTypeException('Sound type not found! Type help for more info.');
         }
 

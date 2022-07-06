@@ -6,28 +6,26 @@ class HelpController extends Controller
 {
     public function handle(): void
     {
-        $commandStorage = $this->application->getConsoleCommandStorage();
-
         $information = "Usage: console.php dog action\n";
-        $information = $this->addAvailableDogsMessagePart($commandStorage->getDogs(), $information);
-        $information = $this->addAvailableActionsMessagePart($commandStorage->getControllers(), $information);
+        $information = $this->addAvailableModelsMessagePart(CONFIG['models'], $information);
+        $information = $this->addAvailableActionsMessagePart(CONFIG['actions'], $information);
 
         $this->formatter->print($information);
     }
 
     /**
-     * @param  array  $dogs
+     * @param  array  $models
      * @param  string $information
      *
      * @return string
      */
-    private function addAvailableDogsMessagePart(array $dogs, string $information): string
+    private function addAvailableModelsMessagePart(array $models, string $information): string
     {
         $information .= "\n";
-        $information .= "Available dogs:\n";
+        $information .= "Available models:\n";
 
-        foreach ($dogs as $dogName => $dogModel) {
-            $information .= "> {$dogName}\n";
+        foreach ($models as $modelName => $modelClass) {
+            $information .= "> {$modelName}\n";
         }
 
         return $information;

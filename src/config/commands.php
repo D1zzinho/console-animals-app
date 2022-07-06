@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'dogs' => [
+    'models' => [
         'plush_pug'        => \App\Models\ToyDogs\PlushPug::class,
         'poodle_with_pipe' => \App\Models\ToyDogs\PoodleWithPipe::class,
         'dachshund'        => \App\Models\RealDogs\Dachshund::class,
