@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-interface Dog
+interface DogInterface
 {
     public function bark(): string;
     public function squeak(): string;

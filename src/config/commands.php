@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'dogs' => [
+    'models' => [
         'plush_pug'        => \App\Models\ToyDogs\PlushPug::class,
         'poodle_with_pipe' => \App\Models\ToyDogs\PoodleWithPipe::class,
         'dachshund'        => \App\Models\RealDogs\Dachshund::class,
@@ -11,14 +11,23 @@ return [
     ],
 
     'actions' => [
-        'sound' => \App\Controllers\SoundController::class,
-        'hunt'  => \App\Controllers\HuntController::class,
+        'sound' => [
+            'class'            => \App\Controllers\SoundController::class,
+            'available_params' => [
+                'bark',
+                'squeak',
+            ],
+        ],
+        'hunt'  => [
+            'class' => \App\Controllers\HuntController::class
+        ],
+    ],
+
+    'other_commands' => [
+        'help' => \App\Controllers\HelpController::class
     ],
 
     'anonymous' => [
-        'help' => function (\App\Console\CommandRequest $request) {
-            \App\Console\Formatter::getInstance()
-                ->print('Usage: console.php dog action');
-        },
+
     ],
 ];

@@ -2,7 +2,9 @@
 
 namespace App\Models\RealDogs;
 
-class GermanShepherd extends \App\Models\RealDog
+use App\Models\AbstractRealDog;
+
+class GermanShepherd extends AbstractRealDog
 {
     /**
      * @return string

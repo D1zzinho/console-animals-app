@@ -61,17 +61,6 @@ class Formatter
     /**
      * @return void
      */
-    public function addTimestamp(): void
-    {
-        $date = new DateTime();
-        $currentTime = $date->format('Y-m-d H:i:s');
-
-        $this->message .= "Script finished at {$currentTime}";
-    }
-
-    /**
-     * @return void
-     */
     public function addSeparator(): void
     {
         $this->message .= '--------------------------------------';
@@ -87,8 +76,6 @@ class Formatter
         $this->addMessage($message);
         $this->addNewLine();
         $this->addSeparator();
-        $this->addNewLine();
-        $this->addTimestamp();
         $this->addNewLine();
 
         return $this->message;

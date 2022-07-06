@@ -6,6 +6,7 @@ if (PHP_SAPI !== 'cli') {
 }
 
 require __DIR__ . '/vendor/autoload.php';
+define("CONFIG", require __DIR__ . '/config/commands.php');
 
 use App\Application;
 
