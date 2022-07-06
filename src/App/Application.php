@@ -47,4 +47,12 @@ class Application
     {
         $this->consoleCommandStorage->callCommand($argc, $argv);
     }
+
+    /**
+     * @return ConsoleCommandStorage
+     */
+    public function getConsoleCommandStorage(): ConsoleCommandStorage
+    {
+        return $this->consoleCommandStorage;
+    }
 }

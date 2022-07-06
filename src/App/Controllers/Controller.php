@@ -12,7 +12,7 @@ abstract class Controller
     protected Application    $application;
     protected Formatter      $formatter;
     protected CommandRequest $request;
-    protected Dog            $dog;
+    protected ?Dog           $dog;
 
     public function __construct()
     {
@@ -27,11 +27,11 @@ abstract class Controller
 
     /**
      * @param  CommandRequest $request
-     * @param  Dog            $dog
+     * @param  Dog|null       $dog
      *
      * @return void
      */
-    public function run(CommandRequest $request, Dog $dog): void
+    public function run(CommandRequest $request, Dog $dog = null): void
     {
         $this->request = $request;
         $this->dog = $dog;

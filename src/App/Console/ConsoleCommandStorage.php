@@ -13,6 +13,7 @@ use Throwable;
 class ConsoleCommandStorage
 {
     const COMMANDS_CONFIG_PATH = __DIR__ . '/../../config/commands.php';
+
     private static ConsoleCommandStorage $instance;
 
     /**
@@ -24,6 +25,11 @@ class ConsoleCommandStorage
      * @var array<string, Controller>
      */
     private array $controllers = [];
+
+    /**
+     * @var array<string, Controller>
+     */
+    private array $otherCommandsControllers = [];
 
     /**
      * @var array<string, callable>
@@ -95,14 +101,26 @@ class ConsoleCommandStorage
     }
 
     /**
+     * @return array
+     */
+    public function getDogs(): array
+    {
+        return $this->dogs;
+    }
+
+    /**
      * @param  string     $name
      * @param  Controller $controller
+     * @param  array      $availableParams
      *
      * @return void
      */
-    public function addController(string $name, Controller $controller): void
+    public function addController(string $name, Controller $controller, array $availableParams = []): void
     {
-        $this->controllers[$name] = $controller;
+        $this->controllers[$name] = [
+            'class'            => $controller,
+            'available_params' => $availableParams
+        ];
     }
 
     /**
@@ -122,7 +140,35 @@ class ConsoleCommandStorage
      */
     private function getController(string $command): ?Controller
     {
-        return isset($this->controllers[$command]) ? new $this->controllers[$command] : null;
+        return isset($this->controllers[$command]['class']) ? new $this->controllers[$command]['class'] : null;
+    }
+
+    /**
+     * @param  array<string, Controller> $controllers
+     *
+     * @return void
+     */
+    public function addOtherCommandControllers(array $controllers): void
+    {
+        $this->otherCommandsControllers = array_merge($this->otherCommandsControllers, $controllers);
+    }
+
+    /**
+     * @param  string $command
+     *
+     * @return Controller|null
+     */
+    private function getOtherCommandController(string $command): ?Controller
+    {
+        return isset($this->otherCommandsControllers[$command]) ? new $this->otherCommandsControllers[$command] : null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getControllers(): array
+    {
+        return $this->controllers;
     }
 
     /**
@@ -170,20 +216,15 @@ class ConsoleCommandStorage
             }
 
             $request = new CommandRequest($argv);
+
             $dog = $this->getDog($request->command);
-
             if (!is_null($dog)) {
-                if (!isset($request->secondCommand)) {
-                    throw new WrongDogActionException('Missing action for dog. Type help for more info.');
-                }
+                $this->callDogAction($request, $dog);
+            }
 
-                $action = $this->getController($request->secondCommand);
-
-                if (is_null($action)) {
-                    throw new WrongDogActionException('Unknown action for dog. Type help for more info.');
-                }
-
-                $action->run($request, $dog);
+            $otherController = $this->getOtherCommandController($request->command);
+            if (!is_null($otherController)) {
+                $otherController->run($request);
                 exit;
             }
 
@@ -192,6 +233,29 @@ class ConsoleCommandStorage
             $this->formatter->printThrowable($e->getMessage());
             exit;
         }
+    }
+
+    /**
+     * @param  CommandRequest $request
+     * @param  Dog            $dog
+     *
+     * @return void
+     * @throws WrongDogActionException
+     */
+    private function callDogAction(CommandRequest $request, Dog $dog): void
+    {
+        if (!isset($request->secondCommand)) {
+            throw new WrongDogActionException('Missing action for dog. Type help for more info.');
+        }
+
+        $action = $this->getController($request->secondCommand);
+
+        if (is_null($action)) {
+            throw new WrongDogActionException('Unknown action for dog. Type help for more info.');
+        }
+
+        $action->run($request, $dog);
+        exit;
     }
 
     /**
@@ -219,6 +283,7 @@ class ConsoleCommandStorage
 
         $this->addDogs($config['dogs']);
         $this->addControllers($config['actions']);
+        $this->addOtherCommandControllers($config['other_commands']);
         $this->addAnonymousCommands($config['anonymous']);
     }
 }
